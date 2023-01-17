@@ -112,11 +112,13 @@ void setup() {
         wifiMulti.addAP(i.ssid, i.passphrase);
     }
 
+    WiFi.setSleep(false); // To overcome BtnA ghost presses problem
+
     uint8_t count = 20;
     while (count-- && (wifiMulti.run() != WL_CONNECTED)) {
         delay(500);
     }
-
+    
     if (!WiFi.isConnected()) {
         m5sEpitaph("Unable to connect to WiFi");
     }
@@ -664,6 +666,8 @@ HTTP_response_t httpRequest(const char *host, uint16_t port, const char *headers
     M5S_DBG("\n> [%d] httpRequest(%s, %d, ...)\n", ts, host, port);
 
     WiFiClientSecure client;
+
+    client.setCACert(spotifyCACertificate);
 
     if (!client.connect(host, port)) {
         return {503, "Service unavailable (unable to connect)"};
